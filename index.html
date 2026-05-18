@@ -228,6 +228,22 @@
     .list-item:hover { background: #f0ece4; }
     .list-item-num { font-size: 0.6rem; color: #c8bfb4; letter-spacing: 0.2em; min-width: 24px; font-weight: 300; }
     .list-item-q { font-size: 0.9rem; color: #4a4038; line-height: 1.6; letter-spacing: 0.04em; font-family: 'Noto Serif TC', serif; font-weight: 300; }
+
+    /* 緣起背面 */
+    .card-back:has(.yuanqi-body) {
+      justify-content: flex-start;
+      overflow-y: auto;
+      padding-top: 32px;
+      padding-bottom: 24px;
+    }
+    .yuanqi-body {
+      font-size: 0.88rem;
+      color: #5c5248;
+      line-height: 2;
+      letter-spacing: 0.05em;
+      font-weight: 300;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -396,7 +412,7 @@ function render() {
       你，就是唯一的答案。</div>
       <div class="intro-cta">輕觸翻開</div>`;
     backEl.innerHTML = `
-      <div class="intro-body">在咖啡廳坐了兩個小時，<br>
+      <div class="yuanqi-body">在咖啡廳坐了兩個小時，<br>
       沒有特別做什麼，<br>
       只是想做一個網頁。<br><br>
       一個人的寂寞，<br>
