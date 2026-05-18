@@ -229,6 +229,21 @@
     .list-item:hover { background: #f0ece4; }
     .list-item-num { font-size: 0.6rem; color: #c8bfb4; letter-spacing: 0.2em; min-width: 24px; font-weight: 300; }
     .list-item-q { font-size: 0.9rem; color: #4a4038; line-height: 1.6; letter-spacing: 0.04em; font-family: 'Noto Serif TC', serif; font-weight: 300; }
+
+    .card-back:has(.yuanqi-body) {
+      justify-content: flex-start;
+      overflow-y: auto;
+      padding-top: 32px;
+      padding-bottom: 24px;
+    }
+    .yuanqi-body {
+      font-size: 0.88rem;
+      color: #5c5248;
+      line-height: 2;
+      letter-spacing: 0.05em;
+      font-weight: 300;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
@@ -354,7 +369,7 @@ const QA = [
   { q:'什麼是依賴？',               a:'' },
   { q:'你對承諾的看法？',           a:'' },
   { q:'什麼會讓你感到驚喜？',       a:'' },
-    { q:'你對執著的看法？',           a:'' },
+    { q:'你對執著的看法？',           a:'放下也是種讓新事物進來的方式。騰出空間迎接新事物一定很困難，但絕對很值得！\nLetting go is also letting in. Making room for something new is always hard, but it\'s worth it.\n\n命中注定的事一定會找到你，但如果一直緊抓著不屬於你的東西，它就無法到來。\nWhat\'s meant to be will always find a way, but it can\'t if you\'re holding onto what isn\'t.\n\n如果無法控制它，就順其自然吧！\nIf you can\'t control it, let it be.\n\n如果想在天空飛翔，你需要離開大地。如果想前進，你需要放下拖累你的過去。\nIf you want to fly in the sky, you need to leave the earth.\n\n當你的能量與目標一致時，顯化才會發生，而不是當你過度執著於結果。\nManifestation happens when you align your energy, not when you cling to expectations.' },
   { q:'什麼是奉獻？',               a:'' },
   { q:'你如何面對背叛？',           a:'' },
   { q:'什麼會讓你感到純粹？',       a:'' },
@@ -388,16 +403,28 @@ function render() {
 
   if (idx === 0) {
     frontEl.innerHTML = `
-      <div class="intro-body">她問她答，她問你答，你問她答。<br>
-      100則問題、100篇回答，是小島醫學生的嚮往。<br>
-      她用這些生活中無以名狀的碎片，<br>
-      拼湊出人生切切實實的模樣。<br>
-      不用誰指點，不要人批改，<br>
-      所有問題都沒有正確答案——<br>
-      你，就是唯一的答案。</div>
+      <div class="intro-body">100則問題、100篇回答，<br>
+      是看了不朽的書之後對自己的嚮往。<br>
+      這些生活中無以名狀的碎片，<br>
+      拼湊出人生的模樣。<br>
+      所有問題都沒有正確答案——</div>
+      <div class="intro-cta">輕觸翻開</div>`;
+    backEl.innerHTML = `
+      <div class="yuanqi-body">在咖啡廳坐了兩個小時，<br>
+      沒有特別做什麼，<br>
+      只是想做一個網頁。<br><br>
+      一個人的寂寞，<br>
+      有時候大到難以想像。<br>
+      曾有一段時間，<br>
+      它混著焦慮，<br>
+      讓我在黑暗裡被吞沒。<br><br>
+      後來發現，<br>
+      寫作，慢慢認識自己，<br>
+      是很療癒的事。<br><br>
+      在人很多的咖啡廳一個人工作。<br>
+      就都變成白噪音了。</div>
       <div class="intro-cta">點擊開始</div>`;
-    backEl.innerHTML = '';
-    labelEl.textContent = '序';
+    labelEl.textContent = '緣起';
     barEl.style.width = '0%';
   } else {
     const item = QA[idx];
@@ -417,7 +444,11 @@ function render() {
 
 function flip() {
   if (animating) return;
-  if (idx === 0) { go(1); return; }
+  if (idx === 0) {
+    if (!flipped) { hinted = true; flipped = true; cardEl.classList.add('flipped'); }
+    else { go(1); }
+    return;
+  }
   hinted = true;
   flipped = !flipped;
   cardEl.classList.toggle('flipped', flipped);
