@@ -394,9 +394,25 @@ function render() {
       不用誰指點，不要人批改，<br>
       所有問題都沒有正確答案——<br>
       你，就是唯一的答案。</div>
+      <div class="intro-cta">輕觸翻開</div>`;
+    backEl.innerHTML = `
+      <div class="intro-body">在咖啡廳坐了兩個小時，<br>
+      沒有特別做什麼，<br>
+      只是想做一個網頁。<br><br>
+      一個人的寂寞，<br>
+      有時候大到難以想像。<br>
+      曾有一段時間，<br>
+      它混著焦慮，<br>
+      讓我在黑暗裡被吞沒。<br><br>
+      後來發現，<br>
+      寫作，還有慢慢認識自己，<br>
+      是很療癒的事。<br><br>
+      喜歡在人很多的咖啡廳一個人工作。<br>
+      他們說什麼聽不清楚，<br>
+      就都變成白噪音了。<br><br>
+      挺好的。</div>
       <div class="intro-cta">點擊開始</div>`;
-    backEl.innerHTML = '';
-    labelEl.textContent = '序';
+    labelEl.textContent = '緣起';
     barEl.style.width = '0%';
   } else {
     const item = QA[idx];
@@ -416,7 +432,11 @@ function render() {
 
 function flip() {
   if (animating) return;
-  if (idx === 0) { go(1); return; }
+  if (idx === 0) {
+    if (!flipped) { hinted = true; flipped = true; cardEl.classList.add('flipped'); }
+    else { go(1); }
+    return;
+  }
   hinted = true;
   flipped = !flipped;
   cardEl.classList.toggle('flipped', flipped);
