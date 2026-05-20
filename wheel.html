@@ -9,7 +9,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
     body {
       min-height: 100vh;
       background: #f5f0e8;
@@ -19,77 +18,38 @@
       justify-content: center;
       font-family: 'Noto Serif TC', serif;
       padding: 20px;
-      gap: 20px;
+      gap: 18px;
     }
-
     .back-link {
-      position: fixed;
-      top: 16px; left: 16px;
-      font-size: 0.72rem;
-      color: #b8a890;
-      letter-spacing: 0.15em;
-      text-decoration: none;
-      font-weight: 300;
+      position: fixed; top: 16px; left: 16px;
+      font-size: 0.72rem; color: #b8a890;
+      letter-spacing: 0.15em; text-decoration: none; font-weight: 300;
     }
     .back-link:hover { color: #7a5c3a; }
-
-    h1 {
-      font-size: 0.72rem;
-      color: #bbb0a0;
-      letter-spacing: 0.28em;
-      font-weight: 300;
-    }
-
-    .wheel-wrap {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
+    h1 { font-size: 0.72rem; color: #bbb0a0; letter-spacing: 0.28em; font-weight: 300; }
+    .wheel-wrap { display: flex; flex-direction: column; align-items: center; }
     .pointer {
       width: 0; height: 0;
       border-left: 9px solid transparent;
       border-right: 9px solid transparent;
       border-top: 16px solid #b09268;
-      margin-bottom: 0px;
-      position: relative;
-      z-index: 2;
+      position: relative; z-index: 2;
     }
-
     canvas { display: block; }
-
     .btn-spin {
       padding: 11px 44px;
-      border: 1.5px solid #b09268;
-      background: transparent;
+      border: 1.5px solid #b09268; background: transparent;
       border-radius: 999px;
-      font-family: 'Noto Serif TC', serif;
-      font-size: 0.9rem;
-      color: #7a5c3a;
-      letter-spacing: 0.2em;
-      cursor: pointer;
+      font-family: 'Noto Serif TC', serif; font-size: 0.9rem;
+      color: #7a5c3a; letter-spacing: 0.2em; cursor: pointer;
       transition: background 0.2s;
     }
     .btn-spin:hover { background: rgba(120,90,50,0.08); }
     .btn-spin:disabled { opacity: 0.35; cursor: default; }
-
-    .result {
-      min-height: 52px;
-      text-align: center;
-    }
-    .result-hint {
-      font-size: 0.68rem;
-      color: #c8b8a8;
-      letter-spacing: 0.2em;
-      font-weight: 300;
-      margin-bottom: 6px;
-    }
-    .result-text {
-      font-size: 1.35rem;
-      color: #3a352e;
-      letter-spacing: 0.1em;
-      font-weight: 300;
-    }
+    .result { min-height: 56px; text-align: center; }
+    .result-hint { font-size: 0.68rem; color: #c8b8a8; letter-spacing: 0.2em; font-weight: 300; margin-bottom: 4px; }
+    .result-r2 { font-size: 0.78rem; color: #a09080; letter-spacing: 0.1em; font-weight: 300; margin-bottom: 2px; }
+    .result-r3 { font-size: 1.2rem; color: #3a352e; letter-spacing: 0.1em; font-weight: 300; }
   </style>
 </head>
 <body>
@@ -105,102 +65,201 @@
 <button class="btn-spin" id="spinBtn">轉一轉</button>
 
 <div class="result" id="result">
-  <div class="result-hint" id="resultHint"></div>
-  <div class="result-text" id="resultText"></div>
+  <div class="result-hint" id="rHint"></div>
+  <div class="result-r2" id="rR2"></div>
+  <div class="result-r3" id="rR3"></div>
 </div>
 
 <script>
-const ITEMS = [
-  { label: '放下 3C',  color: '#ddd0be' },
-  { label: '自由書寫', color: '#ccb8b0' },
-  { label: '靜心冥想', color: '#c8b4a8' },
-  { label: 'Me Time', color: '#d8c4a4' },
-  { label: '到咖啡廳', color: '#d2bc94' },
-  { label: '用情緒輪', color: '#c8aca0' },
-  { label: '音樂療癒', color: '#d4c0ae' },
-  { label: '走進自然', color: '#ccc0a8' },
-  { label: '豐盛感謝', color: '#ccb0a2' },
-  { label: '深度呼吸', color: '#d8c8b4' },
-  { label: '創意塗鴉', color: '#d0b8b0' },
-  { label: '閱讀休息', color: '#d6c6b0' },
+// ── 資料（由 01_wheel-items.md 同步）──────────────────────────
+const R1 = [
+  '感官休息','情緒休息','心理休息','身體休息',
+  '靈性連結','社交休息','創意表達','Me Time'
 ];
 
-const N   = ITEMS.length;
-const ARC = (2 * Math.PI) / N;
+const R2 = [
+  // 感官休息
+  ['放下 3C','燈光調暗','聆聽靜音'],
+  // 情緒休息
+  ['自由書寫','用情緒輪','說出感受'],
+  // 心理休息
+  ['靜心冥想','停止規劃','散步思考'],
+  // 身體休息
+  ['伸展放鬆','深度呼吸','熱水澡'],
+  // 靈性連結
+  ['豐盛感謝','正念冥想','接觸自然'],
+  // 社交休息
+  ['獨自散步','拒絕邀約','安靜充電'],
+  // 創意表達
+  ['塗鴉創作','音樂療癒','寫作記錄'],
+  // Me Time
+  ['到咖啡廳','閱讀休息','走進自然'],
+];
 
-const canvas    = document.getElementById('wheel');
-const ctx       = canvas.getContext('2d');
-const spinBtn   = document.getElementById('spinBtn');
-const resultHint = document.getElementById('resultHint');
-const resultText = document.getElementById('resultText');
+const R3 = [
+  // 放下3C  燈光調暗  聆聽靜音
+  ['關機30分','讀實體書'],['調成暖燈','關燈躺著'],['戴耳塞','去安靜處'],
+  // 自由書寫  用情緒輪  說出感受
+  ['晨間日記','感恩清單'],['找出情緒名字','畫情緒地圖'],['告訴朋友','錄音給自己'],
+  // 靜心冥想  停止規劃  散步思考
+  ['呼吸計時','掃描身體'],['關掉待辦','只看今天'],['無目的走路','邊走邊記錄'],
+  // 伸展放鬆  深度呼吸  熱水澡
+  ['頸肩伸展','睡前瑜珈'],['4-7-8 呼吸','腹式呼吸'],['泡腳','蒸氣浴'],
+  // 豐盛感謝  正念冥想  接觸自然
+  ['寫三件好事','感謝今天'],['身體掃描','觀察思緒'],['赤腳踩草','看樹發呆'],
+  // 獨自散步  拒絕邀約  安靜充電
+  ['無手機散步','黃昏漫步'],['說今天不行','給自己留白'],['待在家','不回訊息'],
+  // 塗鴉創作  音樂療癒  寫作記錄
+  ['隨手畫畫','拼貼照片'],['聽喜歡的歌','跟著哼唱'],['寫下今天','寫信給自己'],
+  // 到咖啡廳  閱讀休息  走進自然
+  ['帶書去坐著','只點一杯'],['讀小說','翻雜誌'],['公園坐著','找一棵樹'],
+];
 
-const SIZE = Math.min(window.innerWidth - 40, 300);
-canvas.width  = SIZE;
-canvas.height = SIZE;
+// ── 色盤 ──────────────────────────────────────────────────────
+const PALETTE = [
+  { r1:'#c0a060', r2:'#d4b880', r3:'#e8d4a8' }, // amber
+  { r1:'#be8888', r2:'#d2a8a8', r3:'#e6c8c8' }, // rose
+  { r1:'#94b080', r2:'#b4c89c', r3:'#d0dcba' }, // sage
+  { r1:'#c49060', r2:'#d8b080', r3:'#ecccaa' }, // peach
+  { r1:'#a890b0', r2:'#c0aac4', r3:'#d8c8d8' }, // lavender
+  { r1:'#b4a870', r2:'#cac090', r3:'#dcd8b0' }, // tan
+  { r1:'#7ea8a8', r2:'#9ec4c4', r3:'#bcd8d8' }, // teal
+  { r1:'#c0a030', r2:'#d8be58', r3:'#ecd890' }, // gold
+];
+
+// ── 展開成 flat arrays ────────────────────────────────────────
+const flatR2 = []; // { label, r1idx }
+const flatR3 = []; // { label, r2idx }
+
+R2.forEach((group, r1i) => {
+  group.forEach(item => flatR2.push({ label: item, r1i }));
+});
+R3.forEach((group, r2i) => {
+  group.forEach(item => flatR3.push({ label: item, r2i }));
+});
+
+const N1 = R1.length;
+const N2 = flatR2.length;
+const N3 = flatR3.length;
+const ARC1 = (2 * Math.PI) / N1;
+const ARC2 = (2 * Math.PI) / N2;
+const ARC3 = (2 * Math.PI) / N3;
+
+// ── Canvas ──────────────────────────────────────────────────
+const canvas  = document.getElementById('wheel');
+const ctx     = canvas.getContext('2d');
+const spinBtn = document.getElementById('spinBtn');
+const rHint   = document.getElementById('rHint');
+const rR2el   = document.getElementById('rR2');
+const rR3el   = document.getElementById('rR3');
+
+const SIZE = Math.min(window.innerWidth - 40, 310);
+canvas.width = canvas.height = SIZE;
+
+const cx = SIZE / 2, cy = SIZE / 2;
+const rOuter = SIZE / 2 - 3;
+const rMid   = rOuter * 0.72;
+const rInner = rOuter * 0.42;
+const rCenter = rOuter * 0.11;
 
 let rotation = 0;
 let spinning  = false;
 
-function draw() {
-  const cx = SIZE / 2, cy = SIZE / 2;
-  const r  = cx - 3;
-  ctx.clearRect(0, 0, SIZE, SIZE);
+function colorFor(r1i, ring) {
+  const p = PALETTE[r1i % PALETTE.length];
+  return ring === 1 ? p.r1 : ring === 2 ? p.r2 : p.r3;
+}
 
-  for (let i = 0; i < N; i++) {
-    const s = rotation + i * ARC - Math.PI / 2;
-    const e = s + ARC;
-
-    ctx.beginPath();
-    ctx.moveTo(cx, cy);
-    ctx.arc(cx, cy, r, s, e);
-    ctx.closePath();
-    ctx.fillStyle = ITEMS[i].color;
-    ctx.fill();
-    ctx.strokeStyle = '#f5f0e8';
-    ctx.lineWidth = 1.5;
-    ctx.stroke();
-
-    // radial text
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.rotate(s + ARC / 2);
-    ctx.textAlign = 'right';
-    ctx.fillStyle = '#4a3d30';
-    ctx.font = `300 ${Math.floor(SIZE / 21)}px "Noto Serif TC"`;
-    ctx.fillText(ITEMS[i].label, r - 8, 5);
-    ctx.restore();
-  }
-
-  // center circle
-  const cr = SIZE / 9;
+function drawAnnularSegment(rIn, rOut, i, N, color) {
+  const arc = (2 * Math.PI) / N;
+  const s   = rotation + i * arc - Math.PI / 2;
+  const e   = s + arc;
   ctx.beginPath();
-  ctx.arc(cx, cy, cr, 0, 2 * Math.PI);
-  ctx.fillStyle = '#b09268';
+  ctx.arc(cx, cy, rOut, s, e);
+  ctx.arc(cx, cy, rIn,  e, s, true);
+  ctx.closePath();
+  ctx.fillStyle = color;
   ctx.fill();
+  ctx.strokeStyle = '#f5f0e8';
+  ctx.lineWidth = 1;
+  ctx.stroke();
+}
 
-  ctx.fillStyle = '#f5f0e8';
-  ctx.font = `300 ${Math.floor(SIZE / 22)}px "Noto Serif TC"`;
+function drawRadialText(text, rIn, rOut, i, N, fontSize) {
+  const arc = (2 * Math.PI) / N;
+  const mid = rotation + i * arc - Math.PI / 2 + arc / 2;
+  const textR = (rIn + rOut) / 2;
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(mid);
   ctx.textAlign = 'center';
   ctx.textBaseline = 'middle';
-  ctx.fillText('自在', cx, cy);
+  ctx.fillStyle = '#3a352e';
+  ctx.font = `300 ${fontSize}px "Noto Serif TC"`;
+  ctx.fillText(text, 0, -textR);
+  ctx.restore();
 }
 
+function draw() {
+  ctx.clearRect(0, 0, SIZE, SIZE);
+
+  // Outer ring (R3) — color only
+  flatR3.forEach((item, i) => {
+    const r1i = flatR2[item.r2i].r1i;
+    drawAnnularSegment(rMid, rOuter, i, N3, colorFor(r1i, 3));
+  });
+
+  // Middle ring (R2) — color + text
+  const fontMid = Math.max(Math.floor((rMid - rInner) * 0.38), 9);
+  flatR2.forEach((item, i) => {
+    drawAnnularSegment(rInner, rMid, i, N2, colorFor(item.r1i, 2));
+    if ((rMid - rInner) > 18) drawRadialText(item.label, rInner, rMid, i, N2, fontMid);
+  });
+
+  // Inner ring (R1) — color + text
+  const fontIn = Math.max(Math.floor((rInner - rCenter) * 0.38), 10);
+  R1.forEach((label, i) => {
+    drawAnnularSegment(rCenter, rInner, i, N1, colorFor(i, 1));
+    drawRadialText(label, rCenter, rInner, i, N1, fontIn);
+  });
+
+  // Center circle
+  ctx.beginPath();
+  ctx.arc(cx, cy, rCenter, 0, 2 * Math.PI);
+  ctx.fillStyle = '#b09268';
+  ctx.fill();
+  ctx.fillStyle = '#f5f0e8';
+  ctx.font = `300 ${Math.floor(rCenter * 0.75)}px "Noto Serif TC"`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('♡', cx, cy);
+}
+
+// ── 結果計算 ─────────────────────────────────────────────────
 function winner() {
   const norm = ((rotation % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
-  const idx  = Math.floor(((2 * Math.PI - norm) % (2 * Math.PI)) / ARC) % N;
-  return ITEMS[idx];
+  const r3i  = Math.floor(((2 * Math.PI - norm) % (2 * Math.PI)) / ARC3) % N3;
+  const r2i  = flatR3[r3i].r2i;
+  const r1i  = flatR2[r2i].r1i;
+  return {
+    r1: R1[r1i],
+    r2: flatR2[r2i].label,
+    r3: flatR3[r3i].label,
+  };
 }
 
+// ── 轉動 ─────────────────────────────────────────────────────
 function spin() {
   if (spinning) return;
   spinning = true;
   spinBtn.disabled = true;
-  resultHint.textContent = '';
-  resultText.textContent = '';
+  rHint.textContent = '';
+  rR2el.textContent = '';
+  rR3el.textContent = '';
 
   const extra  = (4 + Math.random() * 4) * 2 * Math.PI + Math.random() * 2 * Math.PI;
   const target = rotation + extra;
-  const dur    = 3600;
+  const dur    = 3800;
   const t0     = performance.now();
   const r0     = rotation;
 
@@ -209,7 +268,6 @@ function spin() {
     const ease = 1 - Math.pow(1 - t, 4);
     rotation   = r0 + (target - r0) * ease;
     draw();
-
     if (t < 1) {
       requestAnimationFrame(frame);
     } else {
@@ -217,17 +275,16 @@ function spin() {
       spinning = false;
       spinBtn.disabled = false;
       const w = winner();
-      resultHint.textContent = '今天來試試';
-      resultText.textContent = w.label;
+      rHint.textContent = w.r1 + ' ›';
+      rR2el.textContent = w.r2 + ' ›';
+      rR3el.textContent = w.r3;
     }
   }
-
   requestAnimationFrame(frame);
 }
 
 spinBtn.addEventListener('click', spin);
 document.fonts.ready.then(draw);
 </script>
-
 </body>
 </html>
