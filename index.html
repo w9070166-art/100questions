@@ -173,6 +173,19 @@
       text-align: center;
       font-weight: 300;
     }
+    .btn-flip {
+      padding: 10px 36px;
+      border: 1.5px solid #b09268;
+      background: transparent;
+      border-radius: 999px;
+      font-family: 'Noto Serif TC', serif;
+      font-size: 0.9rem;
+      color: #7a5c3a;
+      letter-spacing: 0.18em;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .btn-flip:hover { background: rgba(120,90,50,0.08); }
 
     @media (max-width: 480px) {
       .card-scene { height: 300px; }
@@ -276,6 +289,7 @@
     <span class="progress-label" id="label"></span>
     <button class="btn-nav" id="btnNext" aria-label="下一題">&#8594;</button>
   </div>
+  <button class="btn-flip" id="btnFlip">翻開</button>
 
 <script>
 const QA = [
@@ -398,12 +412,18 @@ const barEl    = document.getElementById('bar');
 const labelEl  = document.getElementById('label');
 const btnPrev  = document.getElementById('btnPrev');
 const btnNext  = document.getElementById('btnNext');
+const btnFlip  = document.getElementById('btnFlip');
 
 function nl2br(s) { return s.replace(/\n/g, '<br>'); }
+
+function updateFlipBtn() {
+  btnFlip.textContent = flipped ? '翻回' : '翻開';
+}
 
 function render() {
   flipped = false;
   cardEl.classList.remove('flipped');
+  updateFlipBtn();
 
   if (idx === 0) {
     frontEl.innerHTML = `
@@ -459,11 +479,13 @@ function flip() {
   if (idx === 0) {
     if (!flipped) { hinted = true; flipped = true; cardEl.classList.add('flipped'); }
     else { go(1); }
+    updateFlipBtn();
     return;
   }
   hinted = true;
   flipped = !flipped;
   cardEl.classList.toggle('flipped', flipped);
+  updateFlipBtn();
 }
 
 function go(dir) {
@@ -479,6 +501,7 @@ function go(dir) {
 cardEl.addEventListener('click', flip);
 btnPrev.addEventListener('click', () => go(-1));
 btnNext.addEventListener('click', () => go(1));
+btnFlip.addEventListener('click', flip);
 
 document.addEventListener('keydown', e => {
   if (e.key === 'ArrowRight' || e.key === 'ArrowDown') go(1);
