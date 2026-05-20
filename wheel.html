@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Self-Care 轉盤</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      background: #f5f0e8;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Noto Serif TC', serif;
+      padding: 20px;
+      gap: 20px;
+    }
+
+    .back-link {
+      position: fixed;
+      top: 16px; left: 16px;
+      font-size: 0.72rem;
+      color: #b8a890;
+      letter-spacing: 0.15em;
+      text-decoration: none;
+      font-weight: 300;
+    }
+    .back-link:hover { color: #7a5c3a; }
+
+    h1 {
+      font-size: 0.72rem;
+      color: #bbb0a0;
+      letter-spacing: 0.28em;
+      font-weight: 300;
+    }
+
+    .wheel-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .pointer {
+      width: 0; height: 0;
+      border-left: 9px solid transparent;
+      border-right: 9px solid transparent;
+      border-top: 16px solid #b09268;
+      margin-bottom: 0px;
+      position: relative;
+      z-index: 2;
+    }
+
+    canvas { display: block; }
+
+    .btn-spin {
+      padding: 11px 44px;
+      border: 1.5px solid #b09268;
+      background: transparent;
+      border-radius: 999px;
+      font-family: 'Noto Serif TC', serif;
+      font-size: 0.9rem;
+      color: #7a5c3a;
+      letter-spacing: 0.2em;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-spin:hover { background: rgba(120,90,50,0.08); }
+    .btn-spin:disabled { opacity: 0.35; cursor: default; }
+
+    .result {
+      min-height: 52px;
+      text-align: center;
+    }
+    .result-hint {
+      font-size: 0.68rem;
+      color: #c8b8a8;
+      letter-spacing: 0.2em;
+      font-weight: 300;
+      margin-bottom: 6px;
+    }
+    .result-text {
+      font-size: 1.35rem;
+      color: #3a352e;
+      letter-spacing: 0.1em;
+      font-weight: 300;
+    }
+  </style>
+</head>
+<body>
+
+<a class="back-link" href="index.html">← 回嚮往</a>
+<h1>SELF - CARE 轉盤</h1>
+
+<div class="wheel-wrap">
+  <div class="pointer"></div>
+  <canvas id="wheel"></canvas>
+</div>
+
+<button class="btn-spin" id="spinBtn">轉一轉</button>
+
+<div class="result" id="result">
+  <div class="result-hint" id="resultHint"></div>
+  <div class="result-text" id="resultText"></div>
+</div>
+
+<script>
+const ITEMS = [
+  { label: '放下 3C',  color: '#ddd0be' },
+  { label: '自由書寫', color: '#ccb8b0' },
+  { label: '靜心冥想', color: '#c8b4a8' },
+  { label: 'Me Time', color: '#d8c4a4' },
+  { label: '到咖啡廳', color: '#d2bc94' },
+  { label: '用情緒輪', color: '#c8aca0' },
+  { label: '音樂療癒', color: '#d4c0ae' },
+  { label: '走進自然', color: '#ccc0a8' },
+  { label: '豐盛感謝', color: '#ccb0a2' },
+  { label: '深度呼吸', color: '#d8c8b4' },
+  { label: '創意塗鴉', color: '#d0b8b0' },
+  { label: '閱讀休息', color: '#d6c6b0' },
+];
+
+const N   = ITEMS.length;
+const ARC = (2 * Math.PI) / N;
+
+const canvas    = document.getElementById('wheel');
+const ctx       = canvas.getContext('2d');
+const spinBtn   = document.getElementById('spinBtn');
+const resultHint = document.getElementById('resultHint');
+const resultText = document.getElementById('resultText');
+
+const SIZE = Math.min(window.innerWidth - 40, 300);
+canvas.width  = SIZE;
+canvas.height = SIZE;
+
+let rotation = 0;
+let spinning  = false;
+
+function draw() {
+  const cx = SIZE / 2, cy = SIZE / 2;
+  const r  = cx - 3;
+  ctx.clearRect(0, 0, SIZE, SIZE);
+
+  for (let i = 0; i < N; i++) {
+    const s = rotation + i * ARC - Math.PI / 2;
+    const e = s + ARC;
+
+    ctx.beginPath();
+    ctx.moveTo(cx, cy);
+    ctx.arc(cx, cy, r, s, e);
+    ctx.closePath();
+    ctx.fillStyle = ITEMS[i].color;
+    ctx.fill();
+    ctx.strokeStyle = '#f5f0e8';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // radial text
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(s + ARC / 2);
+    ctx.textAlign = 'right';
+    ctx.fillStyle = '#4a3d30';
+    ctx.font = `300 ${Math.floor(SIZE / 21)}px "Noto Serif TC"`;
+    ctx.fillText(ITEMS[i].label, r - 8, 5);
+    ctx.restore();
+  }
+
+  // center circle
+  const cr = SIZE / 9;
+  ctx.beginPath();
+  ctx.arc(cx, cy, cr, 0, 2 * Math.PI);
+  ctx.fillStyle = '#b09268';
+  ctx.fill();
+
+  ctx.fillStyle = '#f5f0e8';
+  ctx.font = `300 ${Math.floor(SIZE / 22)}px "Noto Serif TC"`;
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText('自在', cx, cy);
+}
+
+function winner() {
+  const norm = ((rotation % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+  const idx  = Math.floor(((2 * Math.PI - norm) % (2 * Math.PI)) / ARC) % N;
+  return ITEMS[idx];
+}
+
+function spin() {
+  if (spinning) return;
+  spinning = true;
+  spinBtn.disabled = true;
+  resultHint.textContent = '';
+  resultText.textContent = '';
+
+  const extra  = (4 + Math.random() * 4) * 2 * Math.PI + Math.random() * 2 * Math.PI;
+  const target = rotation + extra;
+  const dur    = 3600;
+  const t0     = performance.now();
+  const r0     = rotation;
+
+  function frame(now) {
+    const t    = Math.min((now - t0) / dur, 1);
+    const ease = 1 - Math.pow(1 - t, 4);
+    rotation   = r0 + (target - r0) * ease;
+    draw();
+
+    if (t < 1) {
+      requestAnimationFrame(frame);
+    } else {
+      rotation = target % (2 * Math.PI);
+      spinning = false;
+      spinBtn.disabled = false;
+      const w = winner();
+      resultHint.textContent = '今天來試試';
+      resultText.textContent = w.label;
+    }
+  }
+
+  requestAnimationFrame(frame);
+}
+
+spinBtn.addEventListener('click', spin);
+document.fonts.ready.then(draw);
+</script>
+
+</body>
+</html>
