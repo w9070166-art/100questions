@@ -466,12 +466,12 @@ function render() {
       <div class="card-question">${item.q}</div>
       ${!hinted ? '<div class="card-hint">輕觸翻牌</div>' : ''}`;
     backEl.innerHTML = `<div class="card-answer">${nl2br(item.a)}</div>`;
-    labelEl.textContent = `${idx} / ${qa.length - 1}`;
-    barEl.style.width = (idx / (qa.length - 1) * 100) + '%';
+    labelEl.textContent = `${idx} / ${QA.length - 1}`;
+    barEl.style.width = (idx / (QA.length - 1) * 100) + '%';
   }
 
   btnPrev.disabled = idx === 0;
-  btnNext.disabled = idx === qa.length - 1;
+  btnNext.disabled = idx === QA.length - 1;
 }
 
 function flip() {
@@ -491,7 +491,7 @@ function flip() {
 function go(dir) {
   if (animating) return;
   const next = idx + dir;
-  if (next < 0 || next >= qa.length) return;
+  if (next < 0 || next >= QA.length) return;
   animating = true;
   idx = next;
   render();
