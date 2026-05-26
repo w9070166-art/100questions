@@ -251,7 +251,8 @@
     .list-item-num { font-size: 0.6rem; color: #c8bfb4; letter-spacing: 0.2em; min-width: 24px; font-weight: 300; }
     .list-item-q { font-size: 0.9rem; color: #4a4038; line-height: 1.6; letter-spacing: 0.04em; font-family: 'Noto Serif TC', serif; font-weight: 300; }
 
-    .card-back:has(.yuanqi-body) {
+    .card-back:has(.yuanqi-body),
+    .card-back.long-answer {
       justify-content: flex-start;
       overflow-y: auto;
       padding-top: 32px;
@@ -484,7 +485,10 @@ function render() {
       <div class="card-num">${num}</div>
       <div class="card-question">${item.q}</div>
       ${!hinted ? '<div class="card-hint">輕觸翻牌</div>' : ''}`;
+    const isLong = item.a.length > 100 || (item.a.match(/\n/g) || []).length > 3;
     backEl.innerHTML = `<div class="card-answer">${nl2br(item.a)}</div>`;
+    if (isLong) backEl.classList.add('long-answer');
+    else backEl.classList.remove('long-answer');
     labelEl.textContent = `${idx} / ${QA.length - 1}`;
     barEl.style.width = (idx / (QA.length - 1) * 100) + '%';
   }
